@@ -2,6 +2,8 @@
 const overview = document.querySelector(".overview");
 // GitHub username
 const username = "ltlbrd";
+// repos list on the page
+const repoList = document.querySelector(".repo-list");
 
 // get the user profile from GitHub
 async function getGitProfile () {
@@ -13,7 +15,7 @@ async function getGitProfile () {
 
 getGitProfile();
 
-// add the desired profile data to the page
+// display the desired profile data on the page
 const displayProfile = function (data) {
     const div = document.createElement("div");
     div.classList.add("user-info");
@@ -29,5 +31,23 @@ const displayProfile = function (data) {
     </div>
     `
     overview.append(div);
+    getRepos();
 };
 
+// get public repo data via GitHub API for the user
+async function getRepos () {
+    const fetchRepoData = await fetch(`https://api.github.com/users/${username}/repos?per_page=100&sort=updated`);
+    const repoData = await fetchRepoData.json();
+    console.log(repoData);
+    displayRepos(repoData);
+};
+
+// display the repo data on the page
+const displayRepos = function (repos) {
+  for (repo of repos) {
+    const repoItem = document.createElement("li")
+    repoItem.classList.add("repo");
+    repoItem.innerHTML = `<h3>${repo.name}</h3>`;
+    repoList.append(repoItem);
+  }
+};
