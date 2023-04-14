@@ -2,8 +2,12 @@
 const overview = document.querySelector(".overview");
 // GitHub username
 const username = "ltlbrd";
+// area of page where repos list is displayed
+const repoSection = document.querySelector(".repos");
 // repos list on the page
 const repoList = document.querySelector(".repo-list");
+// individual repo data section
+const repoData = document.querySelector(".repot-data");
 
 // get the user profile from GitHub
 async function getGitProfile () {
@@ -44,10 +48,53 @@ async function getRepos () {
 
 // display the repo data on the page
 const displayRepos = function (repos) {
-  for (repo of repos) {
+  for (const repo of repos) {
     const repoItem = document.createElement("li")
     repoItem.classList.add("repo");
     repoItem.innerHTML = `<h3>${repo.name}</h3>`;
     repoList.append(repoItem);
   }
 };
+
+// listen for a click on one of the displayed repos, provide the requested info
+repoList.addEventListener("click", function (e) {
+  if (e.target.matches("h3")) {
+    const repoName = e.target.innerText;
+    fetchRepoInfo(repoName);
+  }
+});
+
+// get an individual repo's info
+async function fetchRepoInfo (repoName) {
+  const fetchOneRepo = await fetch(`https://api.github.com/repos/${username}/${repoName}`);
+  const repoInfo = await fetchOneRepo.json();
+  //console.log(repoInfo);
+  // get repo languages
+  const fetchLanguages = await fetch(repoInfo.languages_url);
+  const languageData = await fetchLanguages.json();
+  //console.log(languageData);
+
+  // list of languages
+  const languages = [];
+  for (const language in languageData) {
+    languages.push(language);
+  }
+
+  repoInfoDisplay(repoInfo, languages);
+};
+
+const repoInfoDisplay = function (repoInfo, languages) {
+  repoData.innerHTML = "";
+  repoData.classList.remove("hide");
+  repoSection.classList.add("hide");
+  const div = document.createElement("div");
+  div.innerHTML = `
+    <h3>Name: ${repoInfo.name}</h3>
+    <p>Description: ${repoInfo.description}</p>
+    <p>Default Branch: ${repoInfo.default_branch}</p>
+    <p>Languages: ${languages.join(", ")}</p>
+    <a class="visit" href="${repoInfo.html_url}" target="_blank" rel="noreferrer noopener">View Repo on GitHub!</a>
+  `;
+  repoData.append(div);
+};
+
