@@ -7,7 +7,7 @@ const repoSection = document.querySelector(".repos");
 // repos list on the page
 const repoList = document.querySelector(".repo-list");
 // individual repo data section
-const repoData = document.querySelector(".repot-data");
+const repoData = document.querySelector(".repo-data");
 
 // get the user profile from GitHub
 async function getGitProfile () {
